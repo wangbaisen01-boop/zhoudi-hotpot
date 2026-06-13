@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>粥底火锅 · 管理后台</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Noto Sans SC',sans-serif;background:#f5f0eb;color:#2d2420;min-height:100vh}
+
+/* Login */
+.login-screen{max-width:360px;margin:80px auto;padding:32px 24px;text-align:center}
+.login-screen h1{font-size:22px;margin-bottom:4px}
+.login-screen .hint{color:#999;font-size:13px;margin-bottom:24px}
+.login-input{width:100%;padding:14px 16px;border:1.5px solid #e8e0d9;border-radius:12px;font-size:15px;outline:none;margin-bottom:12px;font-family:inherit}
+.login-input:focus{border-color:#c57b57}
+.login-btn{width:100%;padding:14px;border:none;border-radius:12px;background:#c57b57;color:#fff;font-size:16px;font-weight:600;cursor:pointer}
+.login-btn:active{opacity:.9}
+.login-error{color:#e74c3c;font-size:13px;margin-top:8px;display:none}
+
+/* Header */
+.header{background:#2d2420;color:#fff;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.header h1{font-size:16px;font-weight:700}
+.header .status{font-size:12px;opacity:.7}
+.header .logout{background:none;border:1px solid rgba(255,255,255,.3);color:#fff;padding:6px 14px;border-radius:8px;font-size:12px;cursor:pointer}
+
+/* Stats bar */
+.stats{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;scrollbar-width:none}
+.stats::-webkit-scrollbar{display:none}
+.stat-card{flex-shrink:0;background:#fff;border-radius:10px;padding:10px 16px;min-width:80px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.stat-card .num{font-size:20px;font-weight:700;color:#c57b57}
+.stat-card .label{font-size:11px;color:#999;margin-top:2px}
+
+/* Filters */
+.filters{display:flex;gap:8px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter-btn{flex-shrink:0;padding:6px 16px;border-radius:16px;font-size:13px;border:1.5px solid #e8e0d9;background:#fff;color:#666;cursor:pointer;white-space:nowrap}
+.filter-btn.active{background:#c57b57;color:#fff;border-color:#c57b57}
+
+/* Order list */
+.orders{padding:0 16px 80px}
+.empty-state{text-align:center;padding:60px 0;color:#bbb;font-size:14px}
+
+.order-card{background:#fff;border-radius:12px;padding:14px 16px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.order-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.order-no{font-size:13px;font-weight:600;color:#2d2420}
+.order-time{font-size:11px;color:#bbb}
+.order-mid{display:flex;gap:16px;font-size:12px;color:#888;margin-bottom:8px}
+.order-mid span{display:flex;align-items:center;gap:4px}
+.order-items{font-size:13px;color:#555;margin-bottom:8px;line-height:1.6}
+.order-items .item{display:inline;margin-right:4px}
+.order-items .item::after{content:'、'}
+.order-items .item:last-child::after{content:''}
+.order-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:8px;border-top:1px solid #f0ebe6}
+.order-total{font-size:18px;font-weight:700;color:#c57b57}
+.order-actions{display:flex;gap:6px}
+
+/* Status badge */
+.status-badge{font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500}
+.status-pending{background:#fef3e2;color:#e67e22}
+.status-paid{background:#e8f5e9;color:#27ae60}
+.status-completed{background:#e8f0fe;color:#2979ff}
+.status-cancelled{background:#fbe9e7;color:#d32f2f}
+
+/* Action buttons */
+.action-btn{
+  padding:6px 12px;border:none;border-radius:8px;font-size:12px;cursor:pointer;
+  transition:all .15s;font-weight:500
+}
+.action-btn:active{transform:scale(.96)}
+.action-pay{background:#e8f5e9;color:#27ae60}
+.action-done{background:#e8f0fe;color:#2979ff}
+.action-cancel{background:#fbe9e7;color:#d32f2f}
+
+/* New order sound notification area */
+.notif-banner{
+  display:none;background:#c57b57;color:#fff;padding:10px 16px;
+  font-size:13px;font-weight:500;text-align:center;
+  animation:pulse 1s ease infinite
+}
+.notif-banner.show{display:block}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.7}}
+
+/* Loading */
+.loading-dots::after{content:'';animation:dots 1.2s steps(4) infinite}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}100%{content:''}}
+
+/* Mobile responsive */
+@media(max-width:400px){
+  .order-card{padding:12px}
+  .order-total{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-screen" id="loginScreen">
+  <h1>🔐 管理后台</h1>
+  <p class="hint">输入管理员密码查看订单</p>
+  <input class="login-input" type="password" id="adminPass" placeholder="管理员密码" onkeydown="if(event.key==='Enter')doLogin()">
+  <button class="login-btn" onclick="doLogin()">登录</button>
+  <div class="login-error" id="loginError">密码错误，请重试</div>
+</div>
+
+<!-- Main App -->
+<div id="app" style="display:none">
+  <div class="header">
+    <div>
+      <h1>🍲 粥底火锅</h1>
+      <div class="status" id="headerStatus">最近更新：刚刚</div>
+    </div>
+    <button class="logout" onclick="logout()">退出</button>
+  </div>
+
+  <div class="notif-banner" id="notifBanner">🔔 有新订单！</div>
+
+  <div class="stats" id="statsRow"></div>
+  <div class="filters" id="filterRow"></div>
+  <div class="orders" id="orderList"></div>
+</div>
+
+<script>
+// ===== CONFIG =====
+const API_BASE = '/api/order';
+const ADMIN_KEY = localStorage.getItem('admin_key') || '';
+const POLL_INTERVAL = 8000; // 8秒轮询
+const SOUND_ENABLED = true;
+
+// ===== STATE =====
+let orders = [];
+let filterStatus = 'all';
+let lastOrderCount = 0;
+let pollTimer = null;
+
+// ===== LOGIN =====
+function doLogin(){
+  const key = document.getElementById('adminPass').value.trim();
+  if(!key) return;
+  localStorage.setItem('admin_key', key);
+  document.getElementById('loginError').style.display='none';
+  startApp();
+}
+function logout(){
+  localStorage.removeItem('admin_key');
+  document.getElementById('app').style.display='none';
+  document.getElementById('loginScreen').style.display='block';
+  document.getElementById('adminPass').value='';
+  if(pollTimer) clearInterval(pollTimer);
+}
+
+// ===== START =====
+async function startApp(){
+  const key = localStorage.getItem('admin_key');
+  if(!key) return;
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  await loadOrders();
+  // Poll
+  if(pollTimer) clearInterval(pollTimer);
+  pollTimer = setInterval(pollOrders, POLL_INTERVAL);
+}
+startApp();
+
+// ===== FETCH =====
+async function fetchOrders(status){
+  const key = localStorage.getItem('admin_key');
+  if(!key) return [];
+  try{
+    const url = status && status !== 'all' ? `${API_BASE}?status=${status}` : API_BASE;
+    const res = await fetch(url,{
+      headers: { 'Authorization': `Bearer ${key}` }
+    });
+    if(res.status === 401){
+      logout();
+      return [];
+    }
+    return await res.json();
+  }catch(e){
+    return [];
+  }
+}
+
+async function updateOrderStatus(id, status){
+  const key = localStorage.getItem('admin_key');
+  try{
+    const res = await fetch(API_BASE,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${key}`},
+      body:JSON.stringify({id, status})
+    });
+    return res.ok;
+  }catch(e){ return false; }
+}
+
+// ===== POLL =====
+async function loadOrders(){
+  const data = await fetchOrders(filterStatus);
+  if(Array.isArray(data)){
+    orders = data;
+    render();
+  }
+}
+
+async function pollOrders(){
+  const key = localStorage.getItem('admin_key');
+  const data = await fetchOrders('all');
+  if(Array.isArray(data)){
+    orders = data;
+    render();
+    // New order notification
+    if(data.length > lastOrderCount && lastOrderCount > 0){
+      notifyNewOrder();
+    }
+    lastOrderCount = data.length;
+    document.getElementById('headerStatus').textContent = '最近更新：' + new Date().toLocaleTimeString();
+  }
+}
+
+function notifyNewOrder(){
+  const banner = document.getElementById('notifBanner');
+  banner.classList.add('show');
+  if(SOUND_ENABLED) playBeep();
+  setTimeout(()=>banner.classList.remove('show'), 4000);
+}
+
+function playBeep(){
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = 800;
+    gain.gain.value = 0.3;
+    osc.start();
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.stop(ctx.currentTime + 0.3);
+  }catch(e){}
+}
+
+// ===== RENDER =====
+function render(){
+  renderStats();
+  renderFilters();
+  renderOrders();
+}
+
+function renderStats(){
+  const all = orders;
+  const pending = all.filter(o=>o.status==='pending').length;
+  const paid = all.filter(o=>o.status==='paid').length;
+  const total = all.reduce((s,o)=>s+Number(o.total_amount||0),0);
+  document.getElementById('statsRow').innerHTML = `
+    <div class="stat-card"><div class="num">${all.length}</div><div class="label">总订单</div></div>
+    <div class="stat-card"><div class="num" style="color:#e67e22">${pending}</div><div class="label">待处理</div></div>
+    <div class="stat-card"><div class="num" style="color:#27ae60">${paid}</div><div class="label">已支付</div></div>
+    <div class="stat-card"><div class="num" style="color:#888">¥${total.toFixed(0)}</div><div class="label">总金额</div></div>
+  `;
+}
+
+function renderFilters(){
+  const filters = ['all','pending','paid','completed','cancelled'];
+  const labels = ['全部','待处理','已支付','已完成','已取消'];
+  document.getElementById('filterRow').innerHTML = filters.map((f,i)=>
+    `<div class="filter-btn${filterStatus===f?' active':''}" onclick="setFilter('${f}')">${labels[i]}</div>`
+  ).join('');
+}
+
+function setFilter(s){
+  filterStatus = s;
+  loadOrders();
+}
+
+function renderOrders(){
+  const el = document.getElementById('orderList');
+  if(!orders.length){
+    el.innerHTML = '<div class="empty-state">暂无订单</div>';
+    return;
+  }
+  el.innerHTML = orders.map(o=>{
+    const items = typeof o.items === 'string' ? JSON.parse(o.items) : (o.items||[]);
+    const statusClass = 'status-'+o.status;
+    const statusLabels = {pending:'待处理',paid:'已支付',completed:'已完成',cancelled:'已取消'};
+    const noteHtml = o.note ? `<div style="font-size:12px;color:#c57b57;margin-top:4px">📝 ${o.note}</div>` : '';
+    return `
+      <div class="order-card">
+        <div class="order-top">
+          <span class="order-no">${o.order_no||'#'+o.id}</span>
+          <span class="status-badge ${statusClass}">${statusLabels[o.status]||o.status}</span>
+        </div>
+        <div class="order-mid">
+          <span>🪑 ${o.table_no}号桌</span>
+          <span>${new Date(o.created_at).toLocaleString()}</span>
+        </div>
+        <div class="order-items">${items.map(i=>`<span class="item">${i.name}×${i.qty}</span>`).join('')}</div>
+        ${noteHtml}
+        <div class="order-bottom">
+          <span class="order-total">¥${Number(o.total_amount).toFixed(2)}</span>
+          <div class="order-actions">
+            ${o.status==='pending'?`<button class="action-btn action-pay" onclick="doAction(${o.id},'paid')">标记已付</button>`:''}
+            ${o.status==='paid'?`<button class="action-btn action-done" onclick="doAction(${o.id},'completed')">完成</button>`:''}
+            ${o.status!=='cancelled'&&o.status!=='completed'?`<button class="action-btn action-cancel" onclick="doAction(${o.id},'cancelled')">取消</button>`:''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+async function doAction(id, status){
+  const ok = await updateOrderStatus(id, status);
+  if(ok) await loadOrders();
+}
+</script>
+</body>
+</html>

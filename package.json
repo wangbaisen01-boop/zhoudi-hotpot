@@ -1,0 +1,9 @@
+{
+  "name": "zhoudi-hotpot",
+  "version": "1.0.0",
+  "private": true,
+  "description": "粥底火锅 · 扫码点餐系统",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.49.0"
+  }
+}
