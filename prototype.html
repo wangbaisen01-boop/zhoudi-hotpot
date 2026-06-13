@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>粥底火锅 · 设计原型</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Noto Sans SC', -apple-system, sans-serif;
+  background: #f5f0eb;
+  color: #2d2420;
+}
+.phone-frame {
+  max-width: 390px;
+  margin: 20px auto;
+  background: #fff;
+  border-radius: 32px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+  overflow: hidden;
+  position: relative;
+}
+.status-bar {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 24px 8px;
+  font-size: 12px;
+  font-weight: 500;
+}
+.screen { display: none; padding-bottom: 80px; }
+.screen.active { display: block; }
+
+/* Home */
+.screen-home {
+  background: linear-gradient(135deg, #c57b57 0%, #a8643f 100%);
+  min-height: 560px;
+}
+.hero-area {
+  padding: 60px 32px 40px;
+  color: #fff;
+  text-align: center;
+}
+.hero-area .logo { font-size: 48px; margin-bottom: 8px; }
+.hero-area h1 { font-size: 32px; font-weight: 900; letter-spacing: 2px; }
+.hero-area .subtitle { font-size: 14px; opacity: 0.8; margin-top: 4px; letter-spacing: 4px; }
+.features {
+  display: flex; justify-content: center; gap: 24px;
+  padding: 24px 32px; color: rgba(255,255,255,0.9); font-size: 13px;
+}
+.features span { text-align: center; }
+.start-btn {
+  display: block; margin: 32px auto 0; width: 200px;
+  padding: 16px 0; background: #fff; color: #c57b57;
+  border: none; border-radius: 30px; font-size: 18px; font-weight: 700;
+  cursor: pointer; box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+}
+
+/* Table */
+.screen-table { padding: 24px 20px; }
+.screen-table h2 { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.screen-table .hint { font-size: 13px; color: #999; margin-bottom: 20px; }
+.table-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.table-btn {
+  aspect-ratio: 1; border: 2px solid #e8e0d9; border-radius: 14px;
+  background: #fff; font-size: 18px; font-weight: 600; color: #2d2420;
+  cursor: pointer; transition: all 0.2s;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.table-btn:active { background: #f5e6d3; border-color: #c57b57; }
+
+/* Menu */
+.menu-header { padding: 16px 20px 0; display: flex; justify-content: space-between; align-items: center; }
+.menu-header h2 { font-size: 20px; font-weight: 700; }
+.cat-tabs {
+  display: flex; overflow-x: auto; gap: 8px; padding: 12px 20px;
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+}
+.cat-tabs::-webkit-scrollbar { display: none; }
+.cat-tab {
+  flex-shrink: 0; padding: 8px 18px; border-radius: 20px; font-size: 13px; font-weight: 500;
+  border: 1.5px solid #e8e0d9; background: #fff; color: #666; cursor: pointer; white-space: nowrap;
+}
+.cat-tab.active { background: #c57b57; color: #fff; border-color: #c57b57; }
+.dish-list { padding: 0 20px 80px; }
+.dish-card {
+  display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f0ebe6;
+}
+.dish-img {
+  width: 88px; height: 88px; border-radius: 12px; background: #f5f0eb;
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 36px;
+}
+.dish-info { flex: 1; min-width: 0; }
+.dish-name { font-size: 15px; font-weight: 600; }
+.dish-desc { font-size: 12px; color: #999; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dish-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+.dish-price { font-size: 16px; font-weight: 700; color: #c57b57; }
+.dish-price::before { content: '¥'; font-size: 12px; }
+.add-btn {
+  width: 28px; height: 28px; border-radius: 50%; border: none;
+  background: #c57b57; color: #fff; font-size: 16px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+}
+
+/* Cart */
+.cart-float {
+  position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+  max-width: 360px; width: calc(100% - 40px);
+  background: #2d2420; border-radius: 24px; padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3); z-index: 100; cursor: pointer;
+}
+.cart-left { display: flex; align-items: center; gap: 12px; }
+.cart-icon {
+  width: 40px; height: 40px; background: #c57b57; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; position: relative;
+}
+.cart-badge {
+  position: absolute; top: -4px; right: -4px; background: #e74c3c; color: #fff;
+  font-size: 10px; width: 18px; height: 18px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.cart-text { color: rgba(255,255,255,0.7); font-size: 13px; }
+.cart-total { color: #ffd4b0; font-size: 16px; font-weight: 700; }
+.cart-total small { font-size: 12px; }
+
+/* Checkout */
+.screen-checkout { padding: 20px; }
+.screen-checkout h2 { font-size: 20px; font-weight: 700; margin-bottom: 16px; }
+.order-section { margin-bottom: 20px; }
+.order-section h3 { font-size: 14px; color: #666; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.order-table { background: #faf8f6; border-radius: 12px; padding: 14px 16px; display: flex; align-items: center; gap: 8px; }
+.order-table .table-num { background: #c57b57; color: #fff; padding: 4px 14px; border-radius: 16px; font-size: 14px; font-weight: 600; }
+.order-note {
+  width: 100%; border: 1.5px solid #e8e0d9; border-radius: 10px;
+  padding: 12px 14px; font-size: 14px; font-family: inherit; resize: none; outline: none;
+}
+.order-note:focus { border-color: #c57b57; }
+.order-summary { background: #faf8f6; border-radius: 12px; padding: 16px; }
+.order-row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: #666; }
+.order-row.total { border-top: 1px solid #e8e0d9; margin-top: 8px; padding-top: 12px; font-size: 16px; font-weight: 700; color: #2d2420; }
+.order-row.total span:last-child { color: #c57b57; font-size: 20px; }
+.pay-btn {
+  display: block; width: 100%; padding: 16px; border: none; border-radius: 14px;
+  background: linear-gradient(135deg, #c57b57, #a8643f);
+  color: #fff; font-size: 17px; font-weight: 700; cursor: pointer; margin-top: 20px;
+  box-shadow: 0 4px 16px rgba(197,123,87,0.3);
+}
+
+/* Payment */
+.screen-payment { padding: 40px 20px; text-align: center; }
+.screen-payment .pay-amount { font-size: 36px; font-weight: 700; color: #c57b57; margin: 8px 0; }
+.screen-payment .pay-amount::before { content: '¥'; font-size: 20px; }
+.pay-method {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border: 1.5px solid #e8e0d9; border-radius: 12px; margin-bottom: 10px; cursor: pointer;
+}
+.pay-method.selected { border-color: #c57b57; background: #faf5f0; }
+.pay-method-left { display: flex; align-items: center; gap: 12px; }
+.pay-method-left .icon { font-size: 28px; }
+.pay-method-name { font-weight: 500; }
+.pay-method-desc { font-size: 12px; color: #999; }
+
+/* Success */
+.screen-success { padding: 60px 20px; text-align: center; }
+.screen-success .big-icon { font-size: 64px; margin-bottom: 12px; }
+.screen-success h2 { font-size: 22px; font-weight: 700; }
+.screen-success p { color: #666; margin-top: 8px; font-size: 14px; }
+.success-detail { background: #faf8f6; border-radius: 12px; padding: 16px; margin: 24px 0; text-align: left; }
+.success-detail div { display: flex; justify-content: space-between; padding: 6px 0; font-size: 14px; color: #666; }
+
+/* Nav */
+.preview-nav {
+  max-width: 390px; margin: 12px auto 40px;
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+}
+.preview-nav button {
+  padding: 8px 16px; border: 1.5px solid #c57b57; border-radius: 20px;
+  background: #fff; color: #c57b57; font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.preview-nav button:hover { background: #c57b57; color: #fff; }
+.preview-label { text-align: center; font-size: 12px; color: #999; margin: 8px 0 4px; }
+</style>
+</head>
+<body>
+
+<div class="preview-label">📱 点击下方按钮预览各页面</div>
+<div class="preview-nav">
+  <button onclick="showScreen(0)">🏠 首页</button>
+  <button onclick="showScreen(1)">🪑 选桌</button>
+  <button onclick="showScreen(2)">📋 菜单</button>
+  <button onclick="showScreen(3)">🧾 结算</button>
+  <button onclick="showScreen(4)">💳 支付</button>
+  <button onclick="showScreen(5)">✅ 成功</button>
+</div>
+
+<div class="phone-frame">
+  <div class="status-bar"><span>9:41</span><span>📶 🔋</span></div>
+
+  <!-- 0: Home -->
+  <div class="screen screen-home active" id="s0">
+    <div class="hero-area">
+      <div class="logo">🍲</div>
+      <h1>粥底火锅</h1>
+      <p class="subtitle">— 米汤为底 · 鲜滑入魂 —</p>
+    </div>
+    <div class="features">
+      <span>🥩 精选鲜肉</span>
+      <span>🦐 生猛海鲜</span>
+      <span>🥬 时令蔬菜</span>
+    </div>
+    <button class="start-btn" onclick="showScreen(1)">开始点餐 →</button>
+    <p style="padding: 40px 32px; text-align:center; color:rgba(255,255,255,0.5); font-size:12px;">扫码点餐 · 在线支付 · 快捷方便</p>
+  </div>
+
+  <!-- 1: Table -->
+  <div class="screen screen-table" id="s1">
+    <h2>选择桌号 🪑</h2>
+    <p class="hint">请选择您所在的桌号</p>
+    <div class="table-grid" id="tableGrid"></div>
+  </div>
+
+  <!-- 2: Menu -->
+  <div class="screen" id="s2">
+    <div class="menu-header"><h2>菜单 📋</h2><span style="font-size:13px;color:#999;">3号桌</span></div>
+    <div class="cat-tabs" id="catTabs"></div>
+    <div class="dish-list" id="dishList"></div>
+  </div>
+
+  <!-- 3: Checkout -->
+  <div class="screen screen-checkout" id="s3">
+    <h2>确认订单 📝</h2>
+    <div class="order-section">
+      <h3>📍 桌号</h3>
+      <div class="order-table"><span class="table-num">3号桌</span><span style="color:#666;font-size:13px;">大厅</span></div>
+    </div>
+    <div class="order-section">
+      <h3>📝 备注</h3>
+      <textarea class="order-note" rows="2" placeholder="有什么特殊需求？如：少辣、不要香菜…"></textarea>
+    </div>
+    <div class="order-section">
+      <h3>🧾 订单明细</h3>
+      <div class="order-summary" id="orderSummary">
+        <div class="order-row"><span>招牌粥底锅 × 1</span><span>¥38</span></div>
+        <div class="order-row"><span>雪花肥牛 × 2</span><span>¥96</span></div>
+        <div class="order-row total"><span>合计</span><span>¥134</span></div>
+      </div>
+    </div>
+    <button class="pay-btn" onclick="showScreen(4)">去支付 ¥134</button>
+  </div>
+
+  <!-- 4: Payment -->
+  <div class="screen screen-payment" id="s4">
+    <div style="font-size:48px;">💳</div>
+    <h2 style="margin-top:8px;font-size:20px;">选择支付方式</h2>
+    <div class="pay-amount" id="payAmount">134.00</div>
+    <div class="pay-methods">
+      <div class="pay-method selected" onclick="selectPay(this)">
+        <div class="pay-method-left"><span class="icon">💚</span><div><div class="pay-method-name">微信支付</div><div class="pay-method-desc">推荐 · 快速安全</div></div></div>
+        <span style="color:#c57b57;">✓</span>
+      </div>
+      <div class="pay-method" onclick="selectPay(this)">
+        <div class="pay-method-left"><span class="icon">💙</span><div><div class="pay-method-name">支付宝</div><div class="pay-method-desc">支持花呗·信用卡</div></div></div>
+      </div>
+    </div>
+    <button class="pay-btn" onclick="showScreen(5)" style="margin-top:12px;">确认支付</button>
+    <p style="font-size:12px;color:#999;margin-top:12px;">付款后厨房将收到订单，请稍候</p>
+  </div>
+
+  <!-- 5: Success -->
+  <div class="screen screen-success" id="s5">
+    <div class="big-icon">✅</div>
+    <h2>下单成功！</h2>
+    <p>订单已发送到厨房</p>
+    <div class="success-detail">
+      <div><span>订单编号</span><span>#20260613-0088</span></div>
+      <div><span>桌号</span><span>3号桌</span></div>
+      <div><span>支付金额</span><span style="color:#c57b57;font-weight:700;">¥134.00</span></div>
+      <div><span>支付方式</span><span>微信支付</span></div>
+      <div><span>下单时间</span><span>12:30</span></div>
+    </div>
+    <button class="start-btn" onclick="showScreen(2)" style="margin-top:0;">继续加菜</button>
+  </div>
+
+  <!-- Cart Float -->
+  <div class="cart-float" onclick="toggleCart()">
+    <div class="cart-left">
+      <div class="cart-icon"><span>🛒</span><div class="cart-badge" id="cartBadge">3</div></div>
+      <div class="cart-text"><strong>购物车</strong><br>共<span id="cartCount">3</span>件</div>
+    </div>
+    <div class="cart-total">¥<small id="cartTotal">134</small></div>
+  </div>
+</div>
+
+<script>
+// Mock data
+const categories = [
+  { id:'pot', name:'🔥 锅底' }, { id:'meat', name:'🥩 肉类' }, { id:'seafood', name:'🦐 海鲜' },
+  { id:'ball', name:'⚪ 丸滑' }, { id:'veg', name:'🥬 蔬菜' }, { id:'bean', name:'🫘 豆面' },
+  { id:'snack', name:'🥟 小吃' }, { id:'drink', name:'🥤 饮品' }, { id:'rice', name:'🍚 主食' }
+];
+const dishes = {
+  pot: [
+    { name:'招牌粥底锅', price:38, desc:'米汤慢熬，搭配海鲜贝类提鲜，锅开先喝汤', emoji:'🥣' },
+    { name:'麻辣粥底锅', price:42, desc:'在粥底基础上加入麻辣锅底，鲜辣交融', emoji:'🌶️' },
+    { name:'番茄粥底锅', price:40, desc:'酸甜番茄汤底搭配粥底，开胃暖身', emoji:'🍅' }
+  ],
+  meat: [
+    { name:'雪花肥牛', price:48, desc:'精选雪花肥牛，涮8秒即食，入口即化', emoji:'🥩' },
+    { name:'鲜切羊肉', price:46, desc:'新鲜羊肉现切，鲜嫩不膻', emoji:'🐑' },
+    { name:'猪梅花肉', price:36, desc:'猪梅花肉薄切，肉质鲜嫩多汁', emoji:'🐷' },
+    { name:'嫩滑鸡片', price:32, desc:'鸡胸肉片腌制，涮后嫩滑爽口', emoji:'🐔' },
+    { name:'手切鲜牛肉', price:56, desc:'当日鲜牛肉手工现切，肉味浓郁', emoji:'🥩' }
+  ],
+  seafood: [
+    { name:'鲜虾滑', price:36, desc:'手工现打虾滑，Q弹鲜甜', emoji:'🦐' },
+    { name:'生鱼片', price:42, desc:'新鲜现切生鱼片，粥底涮食鲜嫩无比', emoji:'🐟' },
+    { name:'鲜鲍鱼', price:68, desc:'鲜活小鲍鱼，涮粥底鲜美至极', emoji:'🐚' },
+    { name:'白贝', price:28, desc:'新鲜白贝，搭配粥底提鲜一绝', emoji:'🦪' },
+    { name:'墨鱼仔', price:38, desc:'新鲜墨鱼仔，口感爽脆鲜甜', emoji:'🦑' }
+  ],
+  ball: [
+    { name:'手打牛肉丸', price:32, desc:'纯手工捶打牛肉丸，弹牙爆汁', emoji:'⚪' },
+    { name:'鲜虾丸', price:34, desc:'虾肉含量90%以上，鲜甜弹滑', emoji:'🦐' },
+    { name:'墨鱼丸', price:30, desc:'墨鱼肉手工制作，口感爽弹', emoji:'🦑' },
+    { name:'鱼豆腐', price:18, desc:'嫩滑鱼豆腐，吸满汤汁更美味', emoji:'🧈' }
+  ],
+  veg: [
+    { name:'蔬菜拼盘', price:22, desc:'时令蔬菜拼盘，清爽解腻', emoji:'🥬' },
+    { name:'菌菇拼盘', price:28, desc:'多种菌菇搭配，鲜味加倍', emoji:'🍄' },
+    { name:'玉米', price:12, desc:'甜玉米切段，粥底煮后鲜甜', emoji:'🌽' },
+    { name:'土豆片', price:10, desc:'新鲜土豆切薄片，涮煮皆宜', emoji:'🥔' }
+  ],
+  bean: [
+    { name:'鲜豆腐', price:10, desc:'嫩豆腐，吸满粥底汤汁', emoji:'🫘' },
+    { name:'炸腐竹', price:16, desc:'炸腐竹，三秒即食，酥脆与汤汁并存', emoji:'🥟' },
+    { name:'宽粉', price:12, desc:'红薯宽粉，Q弹爽滑', emoji:'🍜' },
+    { name:'油条', price:8, desc:'现炸油条，泡粥吃是一绝', emoji:'🥖' }
+  ],
+  snack: [
+    { name:'凉拌黄瓜', price:12, desc:'爽脆可口的开胃凉菜', emoji:'🥒' },
+    { name:'泡椒凤爪', price:18, desc:'酸辣开胃，停不下来', emoji:'🐔' },
+    { name:'炸春卷', price:15, desc:'金黄酥脆，内馅鲜美', emoji:'🥟' }
+  ],
+  drink: [
+    { name:'酸梅汤', price:8, desc:'自制酸梅汤，解腻消暑', emoji:'🥤' },
+    { name:'王老吉', price:6, desc:'经典凉茶饮料', emoji:'🟡' },
+    { name:'椰汁', price:10, desc:'清甜椰汁，解辣必备', emoji:'🥥' },
+    { name:'啤酒', price:12, desc:'冰镇啤酒，火锅绝配', emoji:'🍺' }
+  ],
+  rice: [
+    { name:'米饭', price:3, desc:'精选大米现蒸', emoji:'🍚' },
+    { name:'杂粮粥', price:8, desc:'多种杂粮慢熬', emoji:'🥣' }
+  ]
+};
+
+function showScreen(idx) {
+  document.querySelectorAll('.screen').forEach((s,i) => s.classList.toggle('active', i===idx));
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+
+// Init table grid
+const tg = document.getElementById('tableGrid');
+for (let i = 1; i <= 12; i++) {
+  const btn = document.createElement('div');
+  btn.className = 'table-btn';
+  btn.innerHTML = `<span style="font-size:20px;margin-bottom:4px;">🪑</span>${i}`;
+  btn.onclick = function() {
+    document.querySelectorAll('.table-btn').forEach(b => { b.style.borderColor = '#e8e0d9'; b.style.background = '#fff'; });
+    this.style.borderColor = '#c57b57'; this.style.background = '#fdf8f3';
+    setTimeout(() => showScreen(2), 300);
+  };
+  tg.appendChild(btn);
+}
+
+// Init category tabs + dishes
+const ct = document.getElementById('catTabs');
+categories.forEach((cat, i) => {
+  const tab = document.createElement('div');
+  tab.className = 'cat-tab' + (i === 0 ? ' active' : '');
+  tab.textContent = cat.name;
+  tab.onclick = function() {
+    document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+    this.classList.add('active');
+    renderDishes(cat.id);
+  };
+  ct.appendChild(tab);
+});
+
+function renderDishes(catId) {
+  const dl = document.getElementById('dishList');
+  dl.innerHTML = '';
+  (dishes[catId] || []).forEach(d => {
+    dl.innerHTML += `
+      <div class="dish-card">
+        <div class="dish-img">${d.emoji}</div>
+        <div class="dish-info">
+          <div class="dish-name">${d.name}</div>
+          <div class="dish-desc">${d.desc}</div>
+          <div class="dish-bottom">
+            <span class="dish-price">${d.price}</span>
+            <button class="add-btn" onclick="this.textContent='✓';this.style.background='#2d8a4e';setTimeout(()=>{this.textContent='+';this.style.background='#c57b57'},400)">+</button>
+          </div>
+        </div>
+      </div>`;
+  });
+}
+renderDishes('pot');
+
+function selectPay(el) {
+  document.querySelectorAll('.pay-method').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function toggleCart() {
+  alert('购物车展开效果\n（正式实现为上滑面板）');
+}
+</script>
+</body>
+</html>
