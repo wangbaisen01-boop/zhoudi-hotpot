@@ -395,8 +395,7 @@ function renderTables() {
 }
 function selectTable(n){
   selectedTable=n;
-  document.querySelectorAll('.table-btn').forEach(b=>b.classList.remove('selected'));
-  event.currentTarget.classList.add('selected');
+  document.querySelectorAll('.table-btn').forEach(b=>b.classList.toggle('selected',parseInt(b.textContent)===n));
   document.getElementById('menuTableTag').textContent=n+'号桌';
   showScreen(2);
 }
@@ -519,7 +518,7 @@ function toggleCart(){
 }
 function goCheckout(){
   toggleCart();
-  showScreen(3);
+  showCheckout();
 }
 
 // ===== CHECKOUT =====
@@ -585,7 +584,6 @@ async function submitOrder(){
 function showScreen(idx){
   document.querySelectorAll('.screen').forEach((s,i)=>s.classList.toggle('active',i===idx));
   window.scrollTo({top:0,behavior:'smooth'});
-  if(idx===3) showCheckout();
 }
 function goTable(){showScreen(1)}
 function goMenu(){
